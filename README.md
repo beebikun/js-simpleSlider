@@ -17,11 +17,11 @@ Can be navigated with navs buttons or with mouse events.
 ```
 
 ```js
-    var el = document.getElementById('slider')
-    var slider =new simpleSlider( el )
+    var el = document.getElementById( 'slider' )
+    var slider = new simpleSlider( el )
 
-    document.getElementById('prev').onclick = function(){pp.next()}
-    document.getElementById('next').onclick = function(){pp.prev()}
+    document.getElementById( 'prev' ).onclick = function(){ slider.next() }
+    document.getElementById( 'next' ).onclick = function(){ slider.prev() }
 
 ```
 
