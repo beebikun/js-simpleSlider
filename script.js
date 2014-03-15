@@ -57,7 +57,7 @@ simpleSlider.prototype._initEvents = function() {
     elem.addEventListener('mouseup', fnUp)
 };
 
-simpleSlider.prototype._clearPosition = function(item) {
+simpleSlider.prototype._clearPosition = function(item) { //clear left style of element after dragging
     item.style.removeProperty('left')
 };
 
@@ -106,16 +106,12 @@ simpleSlider.prototype.prev = function() {
     this._setActive(prev)
 };
 
-var pp;
 window.onload = function(){
     var ul = document.getElementsByTagName('ul')[0]
-    pp = new simpleSlider(ul)    
+    var pp = new simpleSlider(ul) 
 
-    var prev = document.getElementById('prev');
-    var next = document.getElementById('next');
-
-    next.onclick = function(){pp.next() }
-    prev.onclick = function(){pp.prev() }
+    document.getElementById('prev').onclick = function(){pp.next()}
+    document.getElementById('next').onclick = function(){pp.prev()}
 }
 
 
