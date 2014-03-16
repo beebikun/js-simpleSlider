@@ -5,60 +5,57 @@ var simpleSlider = function(elem){
 
 simpleSlider.prototype._init = function(elem) {
     this.elem = elem;
+    this.div = /*this.elem.offsetWidth*/150 * 0.2
     this.items = elem.getElementsByTagName('li');
-    for (var i = this.items.length - 1; i >= 0; i--) {
+    /*for (var i = this.items.length - 1; i >= 0; i--) {
         addClass(this.items[i], 'prev')
-    };
+    };*/
     this._setActive(this.items[0])
     this._initEvents()
 };
 
 simpleSlider.prototype._initEvents = function() {
-    var startEvents = ['mousedown'];
-    var endEvents = ['mouseup'];
     var elem = this.elem;
     var self = this
 
-    var draggable = {
-        active: this.active,
-        prev: this._getPrev(),
-        next: this._getNext()
-    }
-
-    var items = ['active', 'prev', 'next'];
+    var names = ['active', '_prev', '_next'];
 
     function fnDrag(e){
-        elem.style.cursor = 'move';
-        self.cx = getMouse(e).x
+        self.elem.style.cursor = 'move';
         self._inDrag = true;
-        items.forEach(function(name){
-            draggable[name].cx = draggable[name].offsetLeft
-        })
+        self.cx = getMouse(e).x
+        names.forEach(function(name){self[name].cx = self[name].offsetLeft })
     }
     function fnMove(e){
         if(!self._inDrag) return
         var dx = getMouse(e).x - self.cx;
-        self.active.style.left = self.active.cx + dx + 'px';
-        items.forEach(function(name){
-            draggable[name].style.left = draggable[name].cx + dx + 'px'
-        })
+        names.forEach(function(name){self[name].style.left = self[name].cx + dx + 'px'})
     }
     function fnUp(e){
-        var mouse = getMouse(e)
+        if(self.cx == undefined) return
+        var dx = getMouse(e).x - self.cx;
         self._inDrag = false;
         elem.style.cursor = 'default';
-        var nx = self.active.offsetLeft;
-        if(nx < 0) self.next()
-        if(nx > 0) self.prev()
+        names.forEach(function(name){delete self[name].cx })
+        delete self.cx
+        self._clearPosition()
+        if(dx < self.div*-1){
+            self.prev()
+        } else {
+            if(dx > self.div) self.next()
+        }
     }
 
     elem.addEventListener('mousedown', fnDrag)
     elem.addEventListener('mousemove', fnMove)
     elem.addEventListener('mouseup', fnUp)
+    elem.addEventListener('mouseleave', fnUp)
 };
 
-simpleSlider.prototype._clearPosition = function(item) { //clear left style of element after dragging
-    item.style.removeProperty('left')
+simpleSlider.prototype._clearPosition = function() { //clear left style of element after dragging
+    for (var i = this.items.length - 1; i >= 0; i--) {
+        this.items[i].style.removeProperty('left')
+    };
 };
 
 simpleSlider.prototype._getNext = function() {
@@ -69,41 +66,33 @@ simpleSlider.prototype._getPrev = function() {
     return this.active.previousElementSibling || this.items[ this.items.length - 1 ]
 };
 
-simpleSlider.prototype._setActive = function(item) {
-    this._clearPosition(item)
+simpleSlider.prototype._setActive = function(item) {    
     addClass(item, 'active')
-    removeClass(item, 'prev');
-    removeClass(item, 'next');
+    for (var i = this.items.length - 1; i >= 0; i--) {
+        removeClass(this.items[i], 'prev');
+        removeClass(this.items[i], 'next');
+    };
     if( this.active ) removeClass(this.active, 'active')
     this.active = item
-    this._setNext( this._getNext() )
-    this._setPrev( this._getPrev() )
+    this._next = this._getNext()
+    this._prev = this._getPrev()
+    addClass( this._next, 'next' )
+    addClass( this._prev, 'prev' )
 };
 
-simpleSlider.prototype._setNext = function(item) {
-    this._clearPosition(item)
-    removeClass(item, 'prev');
-    addClass(item, 'next');
-};
-
-simpleSlider.prototype._setPrev = function(item) {
-    this._clearPosition(item)
-    removeClass(item, 'next');
-    addClass(item, 'prev');
-};
 
 simpleSlider.prototype.next = function() {
     console.log('next')
-    var next = this._getNext();
-    addClass(this.active, 'prev')
-    this._setActive(next)
+    var prev = this._getPrev();
+    addClass(prev, 'next')  
+    this._setActive(prev)
 };
 
 simpleSlider.prototype.prev = function() {
     console.log('prev')
-    var prev = this._getPrev();
-    addClass(prev, 'next')  
-    this._setActive(prev)
+    var next = this._getNext();
+    addClass(this.active, 'prev')
+    this._setActive(next)
 };
 
 window.onload = function(){
