@@ -58,3 +58,8 @@ function toggleClass(el, name){
     if(hasClass(el, name)) removeClass(el, name)
     else addClass(el, name)
 }
+
+
+function node2array(nodes){
+    return Array.prototype.slice.call(nodes)
+}

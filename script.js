@@ -7,7 +7,7 @@ var simpleSlider = function( elem ){
 simpleSlider.prototype._init = function( elem ) {
     this.elem = elem;
     this.div = this.elem.offsetWidth * 0.2;
-    this.items = elem.getElementsByTagName( 'li' );
+    this.items = elem.getElementsByClassName('simpleSlider-container')[0].getElementsByTagName( 'li' );
     this._setActive( this.items[0] )
     this._initDrag();
     this._initPreview();
@@ -20,24 +20,28 @@ simpleSlider.prototype._initPreview = function() {
         var item = document.createElement( 'li' );
         return item
     }
-    this.previewElem = previewElem = document.createElement( 'ul' );
-    previewElem.className = 'simpleSlider-preview';
-    this.elem.appendChild( previewElem );
-    for (var i = this.items.length - 1; i >= 0; i--) {
+    this.previewElem = document.createElement( 'ul' );
+    this.previewElem.className = 'simpleSlider-preview';
+    var angle = 0, liVal = this.items.length, step = 360 / liVal;
+    while (angle < 360){
         var li = _createItem();
+        var rotate = 'rotateZ(' + angle + 'deg)';
+        li.style['-webkit-transform'] = rotate;
+        li.style['transform'] = rotate;
         li.addEventListener( 'click', function(e){
-            var index = self._getIndex( previewItems, this ), itemslen = self.items.length
+            var index = self._getIndex( self.previewItems, this ), itemslen = self.items.length
             for (var i = 0; i < itemslen; i++) {
                 var item = self.items[i];
                 if( self._getIndex( self.items,  item) == index + 1) break
                 self._setActive( item )
             };
         });
-        previewElem.appendChild( li );
-    };
-    this.previewItems = previewItems = previewElem.getElementsByTagName( 'li' );
+        this.previewElem.appendChild( li );
+        angle += step
+    }
+    this.elem.appendChild( this.previewElem );
+    this.previewItems = this.previewElem.getElementsByTagName( 'li' );
     this._setPreview( this.previewItems[0] )
-
 };
 
 
@@ -134,16 +138,16 @@ simpleSlider.prototype._setActive = function(item) {
 };
 
 
-simpleSlider.prototype.next = function() {
-    console.log('next')
+simpleSlider.prototype.prev = function() {
+    console.log('prev')
     var prev = this._getPrev();
     addClass( prev, 'next' )
     this._setActive( prev )
 };
 
 
-simpleSlider.prototype.prev = function() {
-    console.log('prev')
+simpleSlider.prototype.next = function() {
+    console.log('next')
     var next = this._getNext();
     addClass( this.active, 'prev' )
     this._setActive( next )
@@ -154,6 +158,6 @@ window.onload = function(){
     var elem = document.getElementsByClassName( 'simpleSlider' )[0]
     slider = new simpleSlider( elem ) 
 
-    document.getElementById( 'prev' ).onclick = function(){ slider.next() }
-    document.getElementById( 'next' ).onclick = function(){ slider.prev() }
+    document.getElementById( 'next' ).onclick = function(){ slider.next() }
+    document.getElementById( 'prev' ).onclick = function(){ slider.prev() }
 }
