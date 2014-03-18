@@ -6,9 +6,11 @@ Can be navigated with navs buttons or with mouse events.
 
 ##Usage
 ```html
-<ul class="simpleSlider" id="slider">
-    <li>...</li>
-</ul>
+<div class="simpleSlider" id="slider">
+    <ul class="simpleSlider-container">
+        <li>...</li>
+    </ul>
+</div>
 
 <nav>
     <button id="prev">Prev</button>
