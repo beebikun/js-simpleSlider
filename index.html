@@ -8,19 +8,35 @@
         <script src="eventHelper.js"></script>
         <script src="script.js"></script>
     </head>
-    <body>   
-        <div class="simpleSlider">     
+    <body>
+        <div class="simpleSlider">
             <ul class="simpleSlider-container">
                 <li id="red"></li>
                 <li id="orange"></li>
                 <li id="green"></li>
                 <li id="blue"></li>
-                <li id="purple"></li>            
+                <li id="purple"></li>
             </ul>
         </div>
         <div style="text-align:center">
             <button id="prev">Prev</button>
             <button id="next">Next</button>
         </div>
+
+        <script type="text/javascript">
+            var slider;
+            var elem = document.getElementsByClassName( 'simpleSlider' )[0]
+            slider = new simpleSlider( elem )
+
+            document.getElementById( 'next' ).onclick = function(){ slider.next() }
+            document.getElementById( 'prev' ).onclick = function(){ slider.prev() }
+
+            var elems = new Array;
+            for (var i = 0; i <= 3; i++) {
+                elems.push('<div style="width:100%; height: 100%">' + i + '</div>')
+            };
+
+            slider.update(elems)
+        </script>
     </body>
 </html>

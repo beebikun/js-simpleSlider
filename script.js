@@ -6,42 +6,47 @@ var simpleSlider = function( elem ){
 
 simpleSlider.prototype._init = function( elem ) {
     this.elem = elem;
+    this.elemUl = elem.getElementsByClassName('simpleSlider-container')[0]
     this.div = this.elem.offsetWidth * 0.2;
-    this.items = elem.getElementsByClassName('simpleSlider-container')[0].getElementsByTagName( 'li' );
-    this._setActive( this.items[0] )
+    this._initItems()
     this._initDrag();
-    this._initPreview();
 };
 
 
-simpleSlider.prototype._initPreview = function() {
+simpleSlider.prototype._initItems = function() {
+    this.items = this.elemUl.getElementsByTagName( 'li' );
+    this._setActive( this.active || this.items[0] )
+    this._initThumb();
+}
+
+simpleSlider.prototype._initThumb = function() {
     var self = this;
-    function _createItem () {
-        var item = document.createElement( 'li' );
-        return item
+    if(!this.thumbElem){
+        this.thumbElem = document.createElement( 'ul' );
+        this.thumbElem.className = 'simpleSlider-thumb';
+    } else{
+        this.thumbElem.innerHTML = ''
     }
-    this.previewElem = document.createElement( 'ul' );
-    this.previewElem.className = 'simpleSlider-preview';
     var angle = 0, liVal = this.items.length, step = 360 / liVal;
     while (angle < 360){
-        var li = _createItem();
+        var li = document.createElement( 'li' );
         var rotate = 'rotateZ(' + angle + 'deg)';
         li.style['-webkit-transform'] = rotate;
         li.style['transform'] = rotate;
         li.addEventListener( 'click', function(e){
-            var index = self._getIndex( self.previewItems, this ), itemslen = self.items.length
+            var index = self._getIndex( self.thumbItems, this ), itemslen = self.items.length
             for (var i = 0; i < itemslen; i++) {
                 var item = self.items[i];
                 if( self._getIndex( self.items,  item) == index + 1) break
                 self._setActive( item )
             };
         });
-        this.previewElem.appendChild( li );
+        this.thumbElem.appendChild( li );
         angle += step
     }
-    this.elem.appendChild( this.previewElem );
-    this.previewItems = this.previewElem.getElementsByTagName( 'li' );
-    this._setPreview( this.previewItems[0] )
+    this.elem.appendChild( this.thumbElem );
+    this.thumbItems = this.thumbElem.getElementsByTagName( 'li' );
+    this._setThumb( this.thumbItems[0] )
 };
 
 
@@ -106,40 +111,39 @@ simpleSlider.prototype._getIndex = function( array, node ) {
 };
 
 
-simpleSlider.prototype._setPreview = function(item) {
-    var item = item || this._getPreview();
+simpleSlider.prototype._setThumb = function(item) {
+    var item = item || this._getThumb();
     if( item == undefined ) return
-    if( this.previewActive ) removeClass( this.previewActive, 'active' )
-    this.previewActive = item;
+    if( this.thumbActive ) removeClass( this.thumbActive, 'active' )
+    this.thumbActive = item;
     addClass( item, 'active' )
 };
 
 
-simpleSlider.prototype._getPreview = function() {
+simpleSlider.prototype._getThumb = function() {
     var index = this._getIndex( this.items, this.active );
-    if( index == undefined || this.previewItems == undefined) return
-    return this.previewItems[index];
+    if( index == undefined || this.thumbItems == undefined) return
+    return this.thumbItems[index];
 };
 
 
-simpleSlider.prototype._setActive = function(item) {    
+simpleSlider.prototype._setActive = function(item) {
     addClass( item, 'active' );
     for (var i = this.items.length - 1; i >= 0; i--) {
         removeClass( this.items[i], 'prev' );
         removeClass( this.items[i], 'next' );
     };
-    if( this.active ) removeClass( this.active, 'active' );
+    if( this.active && !this.active.isSameNode(item) ) removeClass( this.active, 'active' );
     this.active = item;
     this._next = this._getNext();
     this._prev = this._getPrev();
     addClass( this._next, 'next' )
     addClass( this._prev, 'prev' )
-    this._setPreview()
+    this._setThumb()
 };
 
 
 simpleSlider.prototype.prev = function() {
-    console.log('prev')
     var prev = this._getPrev();
     addClass( prev, 'next' )
     this._setActive( prev )
@@ -147,17 +151,25 @@ simpleSlider.prototype.prev = function() {
 
 
 simpleSlider.prototype.next = function() {
-    console.log('next')
     var next = this._getNext();
     addClass( this.active, 'prev' )
     this._setActive( next )
 };
 
-var slider;
-window.onload = function(){
-    var elem = document.getElementsByClassName( 'simpleSlider' )[0]
-    slider = new simpleSlider( elem ) 
+simpleSlider.prototype.update = function(elems) { //items - some  array or nodelist or node or string, which will be wrap into li and added to slider
+    var self = this;
 
-    document.getElementById( 'next' ).onclick = function(){ slider.next() }
-    document.getElementById( 'prev' ).onclick = function(){ slider.prev() }
+    function _append(el){
+        var li = document.createElement( 'li' );
+        if( typeof(el) == 'object' ) li.appendChild( el );
+        else li.innerHTML = el;
+        self.elemUl.appendChild( li );
+    }
+
+    if( elems instanceof Array || elems instanceof NodeList ){
+        for (var i = elems.length - 1; i >= 0; i--) {
+            _append(elems[i])
+        };
+    } else {_append(elems) }
+    this._initItems();
 }

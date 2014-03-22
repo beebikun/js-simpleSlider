@@ -27,6 +27,21 @@ Can be navigated with navs buttons or with mouse events.
 
 ```
 
+Also you can add some nodes list or array of html strings or node or html
+
+```js
+    var html = '<img src="..">';
+    slider.update( html )
+    slider.update( [html, html] )
+
+    var img = document.createElement( 'img' );
+    slder.update( img )
+    slder.update( [img, img] )
+
+    var elems = document.getElementsByClassName( 'img-class' )
+    slider.update( elems )
+```
+
 ##TODO
 
 Add touch events
