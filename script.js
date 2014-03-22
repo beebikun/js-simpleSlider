@@ -15,6 +15,7 @@ simpleSlider.prototype._init = function( elem ) {
 
 simpleSlider.prototype._initItems = function() {
     this.items = this.elemUl.getElementsByTagName( 'li' );
+    if(!this.items.length) return
     this._setActive( this.active || this.items[0] )
     this._initThumb();
 }
@@ -44,16 +45,43 @@ simpleSlider.prototype._initThumb = function() {
         this.thumbElem.appendChild( li );
         angle += step
     }
-    this.elem.appendChild( this.thumbElem );
+    this.elem.insertBefore(this.thumbElem, this.elemUl);
     this.thumbItems = this.thumbElem.getElementsByTagName( 'li' );
     this._setThumb( this.thumbItems[0] )
 };
 
 
 simpleSlider.prototype._initDrag = function() {
+    function getMouse (e) {
+        if(e.changedTouches) var e = e.changedTouches[0];
+        return {x: e.clientX, y: e.clientY}
+    }
+
     var self = this, names = ['active', '_prev', '_next'];
+    var cont = this.elemUl.getBoundingClientRect();
+    var pressTimer;
+
+    console.log(this.elemUl)
+    console.log(cont)
+    var circle = {x: cont.width/2 + cont.left, y: cont.height/2 + cont.top, r: cont.width/2 };
+    console.log(circle)
+
+    function inCont( mouse, p ){
+        //@BUG: elemUl перекрывает elemThumb по углам (своим), и поэтому эти места определяются как _in
+        var a = mouse.x - circle.x;
+        var b = mouse.y - circle.y;
+        var c = Math.sqrt( Math.pow(a, 2) + Math.pow(b, 2) );
+        var _in = (c < circle.r)
+        if(_in){
+            console.log(a+';'+b+';'+c+';'+ circle.r)
+            console.log(circle.r - Math.floor(c))
+        }
+        var _in = (mouse.x > cont.left && mouse.x < cont.right) && (mouse.y > cont.top && mouse.y < cont.bottom)
+        return _in
+    }
 
     function fnDrag( e ){
+        var mouse = getMouse( e )
         self.elem.style.cursor = 'move';
         self._inDrag = true;
         self.cx = getMouse( e ).x
@@ -74,14 +102,40 @@ simpleSlider.prototype._initDrag = function() {
         names.forEach( function( name ){delete self[name].cx } )
         delete self.cx
         self._clearPosition()
-        if( dx < self.div*-1 )self.prev()
-        else if( dx > self.div ) self.next()
+        if( dx < self.div*-1 ) self.next()
+        else if( dx > self.div ) self.prev()
     }
 
     self.elem.addEventListener( 'mousedown', fnDrag )
     self.elem.addEventListener( 'mousemove', fnMove )
     self.elem.addEventListener( 'mouseup', fnUp )
     self.elem.addEventListener( 'mouseleave', fnUp )
+
+    function touchHandler(event) {
+        var mouse = getMouse( event );
+        var _inn = inCont( mouse, event.type == 'touchstart' );
+        console.log(_inn)
+        if(!_inn) return
+        var touch = event.changedTouches[0];
+
+        var simulatedEvent = document.createEvent("MouseEvent");
+            simulatedEvent.initMouseEvent({
+            touchstart: "mousedown",
+            touchmove: "mousemove",
+            touchend: "mouseup"
+        }[event.type], true, true, window, 1,
+            touch.screenX, touch.screenY,
+            touch.clientX, touch.clientY, false,
+            false, false, false, 0, null);
+
+        touch.target.dispatchEvent(simulatedEvent);
+        event.preventDefault();
+    }
+
+    this.elem.addEventListener("touchstart", touchHandler, true);
+    this.elem.addEventListener("touchmove", touchHandler, true);
+    this.elem.addEventListener("touchend", touchHandler, true);
+    this.elem.addEventListener("touchcancel", touchHandler, true);
 };
 
 
@@ -156,7 +210,7 @@ simpleSlider.prototype.next = function() {
     this._setActive( next )
 };
 
-simpleSlider.prototype.update = function(elems) { //items - some  array or nodelist or node or string, which will be wrap into li and added to slider
+simpleSlider.prototype.update = function(elems) { //elems - some  array or nodelist or node or string, which will be wrap into li and added to slider
     var self = this;
 
     function _append(el){

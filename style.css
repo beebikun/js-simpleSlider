@@ -2,25 +2,49 @@
     border:1px solid;
     display: inline-block;
     position: relative;
-    border-radius:100px;
 }
 
+/*--------------------------------*/
+
 .simpleSlider{
-    width: 182px;
-    height: 182px;
+    width: 250px;
+    height: 250px;
+}
+
+.simpleSlider-thumb, .simpleSlider-container{
+    width:194px;
+    height: 194px;
+}
+
+
+.simpleSlider-container{
+    top:28px;                                     /* (.simpleSlider.width - simpleSlider-container.width)/2 */
+    left:28px;
 }
 
 .simpleSlider-thumb{
-    width:150px;
-    height: 150px;
+    border: 28px solid green;                     /* same as simpleSlider-container.top */
 }
+
+.simpleSlider-thumb>li{
+    width: 18px;
+    height: 18px;
+    top: -23px;                                   /* -1((simpleSlider-container.top - width)/2 + width) */
+    margin-left: -9px;                            /* -1*width/2 */
+    -webkit-transform-origin: 9px 120px 0;        /* simpleSlider-thumb.width/2 + -1*top */
+    transform-origin: 9px 120px 0;
+}
+
+.simpleSlider>ul, .simpleSlider{
+    border-radius:200px;
+}
+/*--------------------------------*/
 
 .simpleSlider>ul{
     list-style: none;
     margin: 0;
     padding: 0;
     position: absolute;
-    border-radius:100px;
 }
 
 .simpleSlider>ul>li{
@@ -34,10 +58,6 @@
 /*--------------------------------*/
 
 .simpleSlider-container{
-    top:16px;
-    left:16px;
-    width:150px;
-    height: 150px;
     display: inline-block;
     overflow: hidden;
 }
@@ -48,7 +68,7 @@
     width: 100%;
     height: 100%;
     top:0;
-    left: 150px;
+    left: 100%;
     visibility: hidden;
 }
 
@@ -73,31 +93,16 @@
 .simpleSlider-thumb{
     display: inline-block;
     background-color: transparent;
-    border: 16px solid green;
     bottom: 0;
     left:0;
-    z-index: 3;
+    z-index: 10;
 }
 
 .simpleSlider-thumb>li{
-    width: 10px;
-    height: 10px;
     background-color: red;
     cursor: pointer;
-    top: -13px;
-    margin-left: -5px;
-    -webkit-transform-origin: 5px 88px 0; /*with/2 simpleSlider-thumb.Width/2 - top + width*/
-    transform-origin: 5px 88px 0;
 }
 
 .simpleSlider-thumb>li:hover, .simpleSlider-thumb>li.active{
     background-color: yellow;
 }
-
-/*Advanced styles*/
-#red{background-color: #c0392b;}
-#orange{background-color: #d35400;}
-#green{background-color: #00f000;}
-#blue{background-color: #3498db;}
-#purple{background-color: #8e44ad;}
-html{text-align: center; }

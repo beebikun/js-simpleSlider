@@ -5,8 +5,22 @@
 
         <link rel="stylesheet" href="style.css" >
         <script src="domHelper.js"></script>
-        <script src="eventHelper.js"></script>
         <script src="script.js"></script>
+
+        <style type="text/css">
+            #red{background-color: #c0392b;}
+            #orange{background-color: #d35400;}
+            #green{background-color: #00f000;}
+            #blue{background-color: #3498db;}
+            #purple{background-color: #8e44ad;}
+            html{text-align: center; }
+            
+.test{
+    position: absolute;
+    z-index: 1000;
+    background-color: blue;
+}
+        </style>
     </head>
     <body>
         <div class="simpleSlider">
@@ -24,9 +38,8 @@
         </div>
 
         <script type="text/javascript">
-            var slider;
             var elem = document.getElementsByClassName( 'simpleSlider' )[0]
-            slider = new simpleSlider( elem )
+            var slider = new simpleSlider( elem )
 
             document.getElementById( 'next' ).onclick = function(){ slider.next() }
             document.getElementById( 'prev' ).onclick = function(){ slider.prev() }
