@@ -5,6 +5,7 @@ var simpleSlider = function( elem ){
 
 
 simpleSlider.prototype._init = function( elem ) {
+    this.longPressTm = 1000;
     this.elem = elem;
     this.elemUl = elem.getElementsByClassName('simpleSlider-container')[0]
     this.div = this.elem.offsetWidth * 0.2;
@@ -59,11 +60,10 @@ simpleSlider.prototype._initDrag = function() {
 
     var self = this, names = ['active', '_prev', '_next'];
     var cont = this.elemUl.getBoundingClientRect();
-    var pressTimer;
+    var circle = {x: cont.width/2 + cont.left, y: cont.height/2 + cont.top, r: cont.width/2 };
 
     console.log(this.elemUl)
     console.log(cont)
-    var circle = {x: cont.width/2 + cont.left, y: cont.height/2 + cont.top, r: cont.width/2 };
     console.log(circle)
 
     function inCont( mouse, p ){
@@ -81,11 +81,11 @@ simpleSlider.prototype._initDrag = function() {
     }
 
     function fnDrag( e ){
-        var mouse = getMouse( e )
         self.elem.style.cursor = 'move';
         self._inDrag = true;
         self.cx = getMouse( e ).x
         names.forEach( function( name ){self[name].cx = self[name].offsetLeft })
+        self.pressTimer = window.setTimeout(function(){self.longPressFn()}, self.longPressTm)
     }
 
     function fnMove( e ){
@@ -104,6 +104,7 @@ simpleSlider.prototype._initDrag = function() {
         self._clearPosition()
         if( dx < self.div*-1 ) self.next()
         else if( dx > self.div ) self.prev()
+        clearTimeout(self.pressTimer)
     }
 
     self.elem.addEventListener( 'mousedown', fnDrag )
@@ -227,3 +228,12 @@ simpleSlider.prototype.update = function(elems) { //elems - some  array or nodel
     } else {_append(elems) }
     this._initItems();
 }
+
+
+simpleSlider.prototype.longPressFn = function() {
+    addClass(this.elem, 'trem')
+    this.elem.addEventListener('webkitTransitionEnd', function( event ) {
+        removeClass(this, 'trem')
+    }, false );
+    console.log('longPressFn')
+};

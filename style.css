@@ -4,6 +4,12 @@
     position: relative;
 }
 
+.simpleSlider.trem{
+    -webkit-transition: all .1s ease-in;
+    transition: all .1s ease-in;
+    margin-left: 10px;
+}
+
 /*--------------------------------*/
 
 .simpleSlider{
